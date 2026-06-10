@@ -1,0 +1,392 @@
+{
+  "wardrobe_id": "W01",
+  "name": "主衣橱",
+  "source_image": "C:\\Users\\weife\\Pictures\\微信图片_20260608202133_59_9.jpg",
+  "template_type": "built_in_two_bay_wardrobe",
+  "modeling_strategy": "space_first_item_later",
+  "nodes": [
+    {
+      "id": "W01",
+      "parent_id": null,
+      "node_type": "wardrobe",
+      "name": "主衣橱",
+      "template_type": "built_in_two_bay_wardrobe",
+      "order_axis": "left_to_right",
+      "access_pattern": "sliding_or_hinged_door",
+      "visibility": "mixed",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 16
+      }
+    },
+    {
+      "id": "W01-L",
+      "parent_id": "W01",
+      "node_type": "bay",
+      "name": "左侧层板叠放区",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "open_when_door_open",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 16
+      }
+    },
+    {
+      "id": "W01-R",
+      "parent_id": "W01",
+      "node_type": "bay",
+      "name": "右侧挂衣抽屉区",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "open_when_door_open",
+      "visibility": "mixed",
+      "mobility": "fixed",
+      "grid": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 16
+      }
+    },
+    {
+      "id": "W01-L-S01",
+      "parent_id": "W01-L",
+      "node_type": "shelf",
+      "name": "左侧顶层层板",
+      "order_axis": "left_to_right",
+      "access_pattern": "shelf_reach_high",
+      "visibility": "partially_visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S01-G01",
+      "parent_id": "W01-L-S01",
+      "node_type": "stack",
+      "name": "顶层左侧深色叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "partially_visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 2,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S01-G02",
+      "parent_id": "W01-L-S01",
+      "node_type": "stack",
+      "name": "顶层中部彩色叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "partially_visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 2,
+        "y": 0,
+        "w": 2,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S01-G03",
+      "parent_id": "W01-L-S01",
+      "node_type": "stack",
+      "name": "顶层右侧薄衣叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "partially_visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 4,
+        "y": 0,
+        "w": 2,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S02",
+      "parent_id": "W01-L",
+      "node_type": "shelf",
+      "name": "左侧第二层主叠放层",
+      "order_axis": "left_to_right",
+      "access_pattern": "shelf",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 3,
+        "w": 6,
+        "h": 4
+      }
+    },
+    {
+      "id": "W01-L-S02-G01",
+      "parent_id": "W01-L-S02",
+      "node_type": "stack",
+      "name": "第二层左侧叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 3,
+        "w": 2,
+        "h": 4
+      }
+    },
+    {
+      "id": "W01-L-S02-G02",
+      "parent_id": "W01-L-S02",
+      "node_type": "stack",
+      "name": "第二层中部叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 2,
+        "y": 3,
+        "w": 2,
+        "h": 4
+      }
+    },
+    {
+      "id": "W01-L-S02-G03",
+      "parent_id": "W01-L-S02",
+      "node_type": "stack",
+      "name": "第二层右侧叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 4,
+        "y": 3,
+        "w": 2,
+        "h": 4
+      }
+    },
+    {
+      "id": "W01-L-S03",
+      "parent_id": "W01-L",
+      "node_type": "shelf",
+      "name": "左侧第三层混合层",
+      "order_axis": "left_to_right",
+      "access_pattern": "shelf",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 7,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S04",
+      "parent_id": "W01-L",
+      "node_type": "shelf",
+      "name": "左侧第四层深色裤装层",
+      "order_axis": "left_to_right",
+      "access_pattern": "shelf_low",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 10,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S04-G01",
+      "parent_id": "W01-L-S04",
+      "node_type": "stack",
+      "name": "第四层左侧散放组",
+      "order_axis": "mixed",
+      "access_pattern": "stack_access",
+      "visibility": "partially_visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 0,
+        "y": 10,
+        "w": 2,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S04-G02",
+      "parent_id": "W01-L-S04",
+      "node_type": "stack",
+      "name": "第四层中部深色裤装叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 2,
+        "y": 10,
+        "w": 2,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S04-G03",
+      "parent_id": "W01-L-S04",
+      "node_type": "stack",
+      "name": "第四层右侧深色叠放组",
+      "order_axis": "top_to_bottom",
+      "access_pattern": "stack_access",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 4,
+        "y": 10,
+        "w": 2,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-L-S05",
+      "parent_id": "W01-L",
+      "node_type": "shelf_or_floor_cubby",
+      "name": "左侧底层混杂区",
+      "order_axis": "mixed",
+      "access_pattern": "low_reach",
+      "visibility": "partially_hidden",
+      "mobility": "fixed",
+      "needs_sorting": true,
+      "grid": {
+        "x": 0,
+        "y": 13,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-R-S01",
+      "parent_id": "W01-R",
+      "node_type": "shelf",
+      "name": "右侧顶层层板",
+      "order_axis": "left_to_right",
+      "access_pattern": "shelf_reach_high",
+      "visibility": "partially_visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 3
+      }
+    },
+    {
+      "id": "W01-R-H01",
+      "parent_id": "W01-R",
+      "node_type": "hanging_rod",
+      "name": "右侧挂衣杆",
+      "order_axis": "left_to_right",
+      "access_pattern": "hanging",
+      "visibility": "partially_visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 6,
+        "y": 3,
+        "w": 6,
+        "h": 6
+      }
+    },
+    {
+      "id": "W01-R-F01",
+      "parent_id": "W01-R",
+      "node_type": "shelf",
+      "name": "右侧挂衣下方平台",
+      "node_role": "temporary_buffer",
+      "order_axis": "left_to_right",
+      "access_pattern": "shelf_low",
+      "visibility": "visible",
+      "mobility": "fixed",
+      "grid": {
+        "x": 6,
+        "y": 9,
+        "w": 6,
+        "h": 2
+      }
+    },
+    {
+      "id": "W01-R-D01",
+      "parent_id": "W01-R",
+      "node_type": "drawer",
+      "name": "右侧上抽屉",
+      "order_axis": "front_to_back",
+      "access_pattern": "drawer_pull",
+      "visibility": "hidden",
+      "mobility": "fixed",
+      "grid": {
+        "x": 6,
+        "y": 11,
+        "w": 6,
+        "h": 2
+      }
+    },
+    {
+      "id": "W01-R-D02",
+      "parent_id": "W01-R",
+      "node_type": "drawer",
+      "name": "右侧中抽屉",
+      "order_axis": "front_to_back",
+      "access_pattern": "drawer_pull",
+      "visibility": "hidden",
+      "mobility": "fixed",
+      "grid": {
+        "x": 6,
+        "y": 13,
+        "w": 6,
+        "h": 2
+      }
+    },
+    {
+      "id": "W01-R-D03",
+      "parent_id": "W01-R",
+      "node_type": "drawer",
+      "name": "右侧下抽屉",
+      "order_axis": "front_to_back",
+      "access_pattern": "drawer_pull",
+      "visibility": "hidden",
+      "mobility": "fixed",
+      "grid": {
+        "x": 6,
+        "y": 15,
+        "w": 6,
+        "h": 1
+      }
+    }
+  ],
+  "recommended_first_pass": [
+    "Create W01 space tree",
+    "Audit W01-L-S02 with close-up photo",
+    "Audit W01-L-S04 because similar dark clothes need identity separation",
+    "Audit W01-R-H01 from left to right",
+    "Mark W01-L-S05 and W01-R-D01/D02/D03 as not yet audited"
+  ],
+  "display_examples": [
+    "主衣橱 / 左侧第二层 / 右侧叠放组 / 从上往下第 4 件",
+    "主衣橱 / 右侧挂衣杆 / 从左到右第 6 件",
+    "主衣橱 / 右侧中抽屉 / 从前往后第 5 件"
+  ]
+}
