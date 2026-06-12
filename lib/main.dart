@@ -1650,122 +1650,204 @@ class _StoredItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: const Color(0xFF2E2925),
+    return Material(
+      key: ValueKey('stored-item-card-${item.nodeId}-$index'),
+      color: const Color(0xFF2E2925),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
         borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              item.name,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '位置：${item.nodeName}',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: const Color(0xFFD7C3A5)),
-            ),
-            if (_itemAttributeSummary(item).isNotEmpty) ...[
-              const SizedBox(height: 4),
+        onTap: () => _showClothingDetailSheet(context, item, index),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
-                '属性：${_itemAttributeSummary(item)}',
-                key: ValueKey(
-                  'stored-item-detail-summary-${item.nodeId}-$index',
-                ),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: const Color(0xFFD7C3A5)),
-              ),
-            ],
-            if (_itemBrandSizeSummary(item).isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                '品牌尺码：${_itemBrandSizeSummary(item)}',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: const Color(0xFFD7C3A5)),
-              ),
-            ],
-            if (item.locationIndex > 0) ...[
-              const SizedBox(height: 4),
-              Text(
-                '空间序号：第 ${item.locationIndex} 件',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: const Color(0xFFD7C3A5)),
-              ),
-            ],
-            if (item.visualSignature.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                '视觉身份：${item.visualSignature}',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: const Color(0xFFD7C3A5)),
-              ),
-            ],
-            if (item.primaryPhotoRef.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              _StoredPhotoEvidenceBadge(
-                key: ValueKey(
-                  'stored-item-photo-evidence-${item.nodeId}-$index',
+                item.name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-            ],
-            const SizedBox(height: 8),
-            Text(
-              '盘点确认：${_presenceStatusLabel(item.presenceStatus)}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: const Color(0xFFD7FFF6),
-                fontWeight: FontWeight.w800,
+              const SizedBox(height: 4),
+              Text(
+                '位置：${item.nodeName}',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: const Color(0xFFD7C3A5)),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '映射状态：${_twinStatusLabel(item.twinStatus)} / 最近确认：${_lastConfirmedLabel(item.lastConfirmedAt)}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: const Color(0xFFD7FFF6),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                OutlinedButton(
-                  key: ValueKey('presence-present-${item.nodeId}-$index'),
-                  onPressed: () => onPresenceChanged(index, 'present'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF7AD3C2),
-                    side: const BorderSide(color: Color(0xFF6AD8C5)),
-                    visualDensity: VisualDensity.compact,
+              if (_itemAttributeSummary(item).isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  '属性：${_itemAttributeSummary(item)}',
+                  key: ValueKey(
+                    'stored-item-detail-summary-${item.nodeId}-$index',
                   ),
-                  child: const Text('还在'),
-                ),
-                OutlinedButton(
-                  key: ValueKey('presence-missing-${item.nodeId}-$index'),
-                  onPressed: () => onPresenceChanged(index, 'missing'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFFFC45C),
-                    side: const BorderSide(color: Color(0xFFFFC45C)),
-                    visualDensity: VisualDensity.compact,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFFD7C3A5),
                   ),
-                  child: const Text('不在'),
                 ),
               ],
-            ),
-          ],
+              if (_itemBrandSizeSummary(item).isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  '品牌尺码：${_itemBrandSizeSummary(item)}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFFD7C3A5),
+                  ),
+                ),
+              ],
+              if (item.locationIndex > 0) ...[
+                const SizedBox(height: 4),
+                Text(
+                  '空间序号：第 ${item.locationIndex} 件',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFFD7C3A5),
+                  ),
+                ),
+              ],
+              if (item.visualSignature.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text(
+                  '视觉身份：${item.visualSignature}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: const Color(0xFFD7C3A5),
+                  ),
+                ),
+              ],
+              if (item.primaryPhotoRef.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                _StoredPhotoEvidenceBadge(
+                  key: ValueKey(
+                    'stored-item-photo-evidence-${item.nodeId}-$index',
+                  ),
+                ),
+              ],
+              const SizedBox(height: 8),
+              Text(
+                '盘点确认：${_presenceStatusLabel(item.presenceStatus)}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFFD7FFF6),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '映射状态：${_twinStatusLabel(item.twinStatus)} / 最近确认：${_lastConfirmedLabel(item.lastConfirmedAt)}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFFD7FFF6),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  OutlinedButton(
+                    key: ValueKey('presence-present-${item.nodeId}-$index'),
+                    onPressed: () => onPresenceChanged(index, 'present'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF7AD3C2),
+                      side: const BorderSide(color: Color(0xFF6AD8C5)),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    child: const Text('还在'),
+                  ),
+                  OutlinedButton(
+                    key: ValueKey('presence-missing-${item.nodeId}-$index'),
+                    onPressed: () => onPresenceChanged(index, 'missing'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFFFC45C),
+                      side: const BorderSide(color: Color(0xFFFFC45C)),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    child: const Text('不在'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  void _showClothingDetailSheet(
+    BuildContext context,
+    StoredWardrobeItem item,
+    int index,
+  ) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF181411),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return _ClothingDetailSheet(item: item, index: index);
+      },
+    );
+  }
+}
+
+class _ClothingDetailSheet extends StatelessWidget {
+  const _ClothingDetailSheet({required this.item, required this.index});
+
+  final StoredWardrobeItem item;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      key: ValueKey('clothing-detail-sheet-${item.nodeId}-$index'),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        18,
+        20,
+        MediaQuery.of(context).viewInsets.bottom + 24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _BlueprintTag(text: '衣服详情'),
+          const SizedBox(height: 14),
+          Text(
+            item.name,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 14),
+          _DetailRow(label: '当前位置', value: item.nodeName),
+          _DetailRow(label: '定位码', value: _itemLocationCode(item)),
+          _DetailRow(label: '现实找法', value: _itemLocationGuidance(item)),
+          if (_itemAttributeSummary(item).isNotEmpty)
+            _DetailRow(label: '衣服属性', value: _itemAttributeSummary(item)),
+          if (_itemBrandSizeSummary(item).isNotEmpty)
+            _DetailRow(label: '品牌尺码', value: _itemBrandSizeSummary(item)),
+          if (item.visualSignature.isNotEmpty)
+            _DetailRow(label: '视觉身份', value: item.visualSignature),
+          _DetailRow(label: '映射状态', value: _twinStatusLabel(item.twinStatus)),
+          _DetailRow(
+            label: '最近确认',
+            value: _lastConfirmedLabel(item.lastConfirmedAt),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _itemLocationGuidance(item),
+            key: ValueKey(
+              'clothing-detail-location-guidance-${item.nodeId}-$index',
+            ),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: const Color(0xFFD7FFF6),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2211,6 +2293,31 @@ String _itemBrandSizeSummary(StoredWardrobeItem item) {
     item.brand,
     item.size,
   ].where((value) => value.trim().isNotEmpty).join(' / ');
+}
+
+String _itemLocationCode(StoredWardrobeItem item) {
+  final nodeCode = item.nodeId.replaceFirst('W01-', '');
+  if (item.locationIndex <= 0) {
+    return nodeCode;
+  }
+  return '$nodeCode-${item.locationIndex}';
+}
+
+String _itemLocationGuidance(StoredWardrobeItem item) {
+  final index = item.locationIndex;
+  if (index <= 0) {
+    return '先确认这件衣服所在的具体顺序。';
+  }
+  if (item.nodeId.contains('-H')) {
+    return '在${item.nodeName}，按从左到右找第 $index 件。';
+  }
+  if (item.nodeId.contains('-D')) {
+    return '打开${item.nodeName}，按从前到后找第 $index 件。';
+  }
+  if (item.nodeId.contains('-S')) {
+    return '在${item.nodeName}，按从上到下找第 $index 件。';
+  }
+  return '在${item.nodeName}，找第 $index 件。';
 }
 
 String _twinStatusLabel(String status) {

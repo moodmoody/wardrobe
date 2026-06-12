@@ -114,6 +114,26 @@ void main() {
       );
       expect(find.textContaining('mock://photo/W01-R-H01/'), findsNothing);
 
+      await tester.tap(
+        find.byKey(const ValueKey('stored-item-card-W01-R-H01-0')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('clothing-detail-sheet-W01-R-H01-0')),
+        findsOneWidget,
+      );
+      expect(find.textContaining('R-H01-3'), findsOneWidget);
+      expect(
+        find.byKey(
+          const ValueKey('clothing-detail-location-guidance-W01-R-H01-0'),
+        ),
+        findsOneWidget,
+      );
+      expect(find.textContaining('mapped'), findsNothing);
+
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
       tester.state<NavigatorState>(find.byType(Navigator)).pop();
       await tester.pumpAndSettle();
       await tester.pumpWidget(const SizedBox.shrink());
