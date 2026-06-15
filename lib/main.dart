@@ -1127,7 +1127,7 @@ class _SpatialMapCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'W01 空间剖面图',
+                    'W01 数字衣橱',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: const Color(0xFFFFF7EA),
                       fontWeight: FontWeight.w900,
@@ -1144,16 +1144,33 @@ class _SpatialMapCard extends StatelessWidget {
                 key: const ValueKey('wardrobe-spatial-map'),
                 children: [
                   Positioned.fill(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset(
+                            'assets/images/w01-digital-twin-bg.jpg',
+                            fit: BoxFit.fill,
+                            filterQuality: FilterQuality.medium,
+                          ),
+                          const DecoratedBox(
+                            decoration: BoxDecoration(color: Color(0x7A241812)),
+                          ),
+                          CustomPaint(painter: _WardrobeGridPainter()),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3B281B),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: const Color(0xFFFFE8C2),
                           width: 2,
                         ),
                       ),
-                      child: CustomPaint(painter: _WardrobeGridPainter()),
                     ),
                   ),
                   const Positioned(

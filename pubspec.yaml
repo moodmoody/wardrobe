@@ -59,6 +59,7 @@ flutter:
 
   assets:
     - assets/images/w01-reference.jpg
+    - assets/images/w01-digital-twin-bg.jpg
     - examples/W01-real-wardrobe-storage-nodes.json
 
   # To add assets to your application, add an assets section, like this:
