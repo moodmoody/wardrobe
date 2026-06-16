@@ -60,6 +60,17 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('R-H01-2'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('confirm-present-from-detail-W01-R-H01-0')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      store.session.itemsByNode['W01-R-H01']!.first.presenceStatus,
+      'present',
+    );
+    expect(find.textContaining('异常衣服（0）'), findsOneWidget);
   });
 }
 

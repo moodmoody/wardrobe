@@ -739,8 +739,21 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
       if (!mounted) {
         return;
       }
-      _showClothingDetailSheet(context, item, itemIndex);
+      _showClothingDetailSheet(
+        context,
+        item,
+        itemIndex,
+        onConfirmPresent: item.presenceStatus == 'missing'
+            ? () => _confirmStoredItemPresent(item)
+            : null,
+      );
     });
+  }
+
+  void _confirmStoredItemPresent(StoredWardrobeItem item) {
+    final node = widget.model.nodeById(item.nodeId);
+    final itemIndex = _storedItemIndex(item);
+    _setItemPresenceStatus(node, itemIndex, 'present');
   }
 
   int _storedItemIndex(StoredWardrobeItem item) {
@@ -2050,8 +2063,9 @@ class _StoredItemCard extends StatelessWidget {
 void _showClothingDetailSheet(
   BuildContext context,
   StoredWardrobeItem item,
-  int index,
-) {
+  int index, {
+  VoidCallback? onConfirmPresent,
+}) {
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -2060,16 +2074,25 @@ void _showClothingDetailSheet(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
     builder: (context) {
-      return _ClothingDetailSheet(item: item, index: index);
+      return _ClothingDetailSheet(
+        item: item,
+        index: index,
+        onConfirmPresent: onConfirmPresent,
+      );
     },
   );
 }
 
 class _ClothingDetailSheet extends StatelessWidget {
-  const _ClothingDetailSheet({required this.item, required this.index});
+  const _ClothingDetailSheet({
+    required this.item,
+    required this.index,
+    this.onConfirmPresent,
+  });
 
   final StoredWardrobeItem item;
   final int index;
+  final VoidCallback? onConfirmPresent;
 
   @override
   Widget build(BuildContext context) {
@@ -2120,6 +2143,31 @@ class _ClothingDetailSheet extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
+          if (onConfirmPresent != null) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                key: ValueKey(
+                  'confirm-present-from-detail-${item.nodeId}-$index',
+                ),
+                onPressed: () {
+                  onConfirmPresent!();
+                  Navigator.of(context).pop();
+                },
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF7AD3C2),
+                  foregroundColor: const Color(0xFF12201C),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                icon: const Icon(Icons.check_circle_outline),
+                label: const Text('重新确认还在'),
+              ),
+            ),
+          ],
         ],
       ),
     );
