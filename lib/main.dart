@@ -604,10 +604,7 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
                         padding: const EdgeInsets.only(bottom: 10),
                         child: _SearchResultTile(
                           item: item,
-                          onTap: () {
-                            setState(() => _selectedNodeId = item.nodeId);
-                            Navigator.of(context).pop();
-                          },
+                          onTap: () => _openFoundClothing(item, context),
                         ),
                       ),
                 ],
@@ -617,6 +614,26 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
         );
       },
     );
+  }
+
+  void _openFoundClothing(StoredWardrobeItem item, BuildContext sheetContext) {
+    final itemIndex = _storedItemIndex(item);
+    setState(() => _selectedNodeId = item.nodeId);
+    Navigator.of(sheetContext).pop();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      _showClothingDetailSheet(context, item, itemIndex);
+    });
+  }
+
+  int _storedItemIndex(StoredWardrobeItem item) {
+    final items = _itemsByNode[item.nodeId] ?? const <StoredWardrobeItem>[];
+    final index = items.indexWhere((candidate) {
+      return _sameClothingIdentity(candidate, item);
+    });
+    return index < 0 ? 0 : index;
   }
 
   void _showAddItemSheet(StorageNode node, VoidCallback refreshDetailSheet) {
@@ -1789,24 +1806,24 @@ class _StoredItemCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  void _showClothingDetailSheet(
-    BuildContext context,
-    StoredWardrobeItem item,
-    int index,
-  ) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: const Color(0xFF181411),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return _ClothingDetailSheet(item: item, index: index);
-      },
-    );
-  }
+void _showClothingDetailSheet(
+  BuildContext context,
+  StoredWardrobeItem item,
+  int index,
+) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: const Color(0xFF181411),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) {
+      return _ClothingDetailSheet(item: item, index: index);
+    },
+  );
 }
 
 class _ClothingDetailSheet extends StatelessWidget {

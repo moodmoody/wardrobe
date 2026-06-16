@@ -18,6 +18,7 @@ void main() {
           nodeId: 'W01-R-H01',
           nodeName: 'right hanging rod',
           presenceStatus: 'missing',
+          locationIndex: 2,
         ),
       ),
     );
@@ -43,6 +44,17 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('spatial-W01-R-H01')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('clothing-detail-sheet-W01-R-H01-0')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('R-H01-2'), findsOneWidget);
+    expect(
+      find.byKey(
+        const ValueKey('clothing-detail-location-guidance-W01-R-H01-0'),
+      ),
+      findsOneWidget,
+    );
   });
 }
 
