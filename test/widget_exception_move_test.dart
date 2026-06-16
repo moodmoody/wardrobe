@@ -58,6 +58,30 @@ void main() {
     expect(movedItem.presenceStatus, 'unknown');
     expect(movedItem.locationIndex, 1);
     expect(find.textContaining('异常衣服（0）'), findsOneWidget);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('show-node-detail-button')),
+    );
+    await tester.tap(find.byKey(const ValueKey('show-node-detail-button')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('pending-confirmation-W01-R-D01-0')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('待重新确认'), findsOneWidget);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('presence-present-W01-R-D01-0')),
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('presence-present-W01-R-D01-0')),
+    );
+    await tester.pumpAndSettle();
+
+    final confirmedItem = store.session.itemsByNode['W01-R-D01']!.single;
+    expect(confirmedItem.presenceStatus, 'present');
+    expect(confirmedItem.twinStatus, 'mapped');
   });
 }
 

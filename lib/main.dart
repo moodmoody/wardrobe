@@ -2026,6 +2026,10 @@ class _StoredItemCard extends StatelessWidget {
                 ),
               ],
               const SizedBox(height: 8),
+              if (item.presenceStatus == 'unknown') ...[
+                _PendingConfirmationBanner(item: item, index: index),
+                const SizedBox(height: 8),
+              ],
               Text(
                 '盘点确认：${_presenceStatusLabel(item.presenceStatus)}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -2070,6 +2074,49 @@ class _StoredItemCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PendingConfirmationBanner extends StatelessWidget {
+  const _PendingConfirmationBanner({required this.item, required this.index});
+
+  final StoredWardrobeItem item;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      key: ValueKey('pending-confirmation-${item.nodeId}-$index'),
+      decoration: BoxDecoration(
+        color: const Color(0x3322FFE0),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF6AD8C5)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.fact_check_outlined,
+              color: Color(0xFF7AD3C2),
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '待重新确认：这件衣服刚移动到新位置，请在现实衣橱确认后点“还在”。',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFFD7FFF6),
+                  fontWeight: FontWeight.w800,
+                  height: 1.35,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
