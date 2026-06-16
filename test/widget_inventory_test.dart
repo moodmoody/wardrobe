@@ -45,6 +45,14 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('show-node-detail-button')));
     await tester.pumpAndSettle();
 
+    expect(
+      find.byKey(const ValueKey('inventory-summary-W01-R-H01')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('应有 2 件'), findsOneWidget);
+    expect(find.textContaining('已确认 0 件'), findsOneWidget);
+    expect(find.textContaining('未确认 2 件'), findsOneWidget);
+
     await tester.ensureVisible(
       find.byKey(const ValueKey('presence-present-W01-R-H01-0')),
     );
@@ -57,6 +65,8 @@ void main() {
       store.session.itemsByNode['W01-R-H01']![0].presenceStatus,
       'present',
     );
+    expect(find.textContaining('已确认 1 件'), findsOneWidget);
+    expect(find.textContaining('未确认 1 件'), findsOneWidget);
 
     await tester.ensureVisible(
       find.byKey(const ValueKey('presence-missing-W01-R-H01-1')),
@@ -71,6 +81,9 @@ void main() {
       'missing',
     );
     expect(store.session.auditStatuses['W01-R-H01'], 'verified');
+    expect(find.textContaining('已确认 2 件'), findsOneWidget);
+    expect(find.textContaining('缺失 1 件'), findsOneWidget);
+    expect(find.textContaining('未确认 0 件'), findsOneWidget);
   });
 }
 

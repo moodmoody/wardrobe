@@ -1478,6 +1478,8 @@ class _WardrobeNodeDetail extends StatelessWidget {
                     'x${node.grid!.x} y${node.grid!.y} / ${node.grid!.w}x${node.grid!.h}',
               ),
             const SizedBox(height: 16),
+            _InventorySummaryCard(node: node, items: storedItems),
+            const SizedBox(height: 16),
             _StoredItemsPanel(
               items: storedItems,
               onAddItem: onAddItem,
@@ -1492,6 +1494,88 @@ class _WardrobeNodeDetail extends StatelessWidget {
             const SizedBox(height: 16),
             _NextActionCard(node: node),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InventorySummaryCard extends StatelessWidget {
+  const _InventorySummaryCard({required this.node, required this.items});
+
+  final StorageNode node;
+  final List<StoredWardrobeItem> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final totalCount = items.length;
+    final presentCount = items
+        .where((item) => item.presenceStatus == 'present')
+        .length;
+    final missingCount = items
+        .where((item) => item.presenceStatus == 'missing')
+        .length;
+    final confirmedCount = presentCount + missingCount;
+    final unknownCount = totalCount - confirmedCount;
+
+    return DecoratedBox(
+      key: ValueKey('inventory-summary-${node.id}'),
+      decoration: BoxDecoration(
+        color: const Color(0xFF203A34),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFF6AD8C5)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '区域盘点',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _InventoryMetric(text: '应有 $totalCount 件'),
+                _InventoryMetric(text: '已确认 $confirmedCount 件'),
+                _InventoryMetric(text: '缺失 $missingCount 件'),
+                _InventoryMetric(text: '未确认 $unknownCount 件'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InventoryMetric extends StatelessWidget {
+  const _InventoryMetric({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: const Color(0x3322FFE0),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0x556AD8C5)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        child: Text(
+          text,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: const Color(0xFFD7FFF6),
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ),
     );
