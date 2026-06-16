@@ -5,32 +5,25 @@ import 'package:wardrobe_twin/domain/wardrobe_session.dart';
 import 'package:wardrobe_twin/main.dart';
 
 void main() {
-  testWidgets('exception list opens missing clothing detail', (tester) async {
+  testWidgets('exception detail can move missing clothing to a new node', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
     final store = _FakeWardrobeSessionStore(
-      WardrobeSession.empty()
-          .addItem(
-            const StoredWardrobeItem(
-              name: 'black coat',
-              nodeId: 'W01-R-H01',
-              nodeName: 'right hanging rod',
-              presenceStatus: 'missing',
-              locationIndex: 2,
-            ),
-          )
-          .addItem(
-            const StoredWardrobeItem(
-              name: 'white shirt',
-              nodeId: 'W01-R-H01',
-              nodeName: 'right hanging rod',
-              presenceStatus: 'present',
-              locationIndex: 3,
-            ),
-          ),
+      WardrobeSession.empty().addItem(
+        const StoredWardrobeItem(
+          itemId: 'item-black-coat',
+          name: 'black coat',
+          nodeId: 'W01-R-H01',
+          nodeName: 'right hanging rod',
+          presenceStatus: 'missing',
+          locationIndex: 2,
+        ),
+      ),
     );
 
     await tester.pumpWidget(WardrobeTwinApp(sessionStore: store));
@@ -40,40 +33,31 @@ void main() {
     );
     await _pumpUntilFound(tester, find.textContaining('异常衣服（1）'));
 
-    expect(find.textContaining('异常衣服（1）'), findsOneWidget);
-
     await tester.tap(find.byKey(const ValueKey('exception-clothes-button')));
     await tester.pumpAndSettle();
-
-    expect(
-      find.byKey(const ValueKey('exception-clothes-sheet')),
-      findsOneWidget,
-    );
-    expect(find.text('black coat'), findsOneWidget);
-    expect(find.text('white shirt'), findsNothing);
-
     await tester.tap(find.text('black coat'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(const ValueKey('clothing-detail-sheet-W01-R-H01-0')),
-      findsOneWidget,
-    );
-    expect(find.textContaining('R-H01-2'), findsOneWidget);
-
     await tester.tap(
-      find.byKey(const ValueKey('confirm-present-from-detail-W01-R-H01-0')),
+      find.byKey(const ValueKey('move-from-detail-W01-R-H01-0')),
     );
     await tester.pumpAndSettle();
 
-    expect(
-      store.session.itemsByNode['W01-R-H01']!.first.presenceStatus,
-      'present',
+    expect(find.byKey(const ValueKey('move-target-sheet')), findsOneWidget);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('move-target-node-W01-R-D01')),
     );
+    await tester.tap(find.byKey(const ValueKey('move-target-node-W01-R-D01')));
+    await tester.pumpAndSettle();
+
+    expect(store.session.itemsByNode['W01-R-H01'], isEmpty);
+    final movedItem = store.session.itemsByNode['W01-R-D01']!.single;
+    expect(movedItem.itemId, 'item-black-coat');
+    expect(movedItem.nodeId, 'W01-R-D01');
+    expect(movedItem.presenceStatus, 'unknown');
+    expect(movedItem.locationIndex, 1);
     expect(find.textContaining('异常衣服（0）'), findsOneWidget);
-
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpAndSettle();
   });
 }
 

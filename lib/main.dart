@@ -746,6 +746,14 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
         onConfirmPresent: item.presenceStatus == 'missing'
             ? () => _confirmStoredItemPresent(item)
             : null,
+        moveTargets: item.presenceStatus == 'missing'
+            ? _spatialNodes
+                  .where((node) => node.id != item.nodeId)
+                  .toList(growable: false)
+            : const <StorageNode>[],
+        onMoveToNode: item.presenceStatus == 'missing'
+            ? (targetNode) => _moveFoundClothingToNode(item, targetNode)
+            : null,
       );
     });
   }
@@ -754,6 +762,14 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
     final node = widget.model.nodeById(item.nodeId);
     final itemIndex = _storedItemIndex(item);
     _setItemPresenceStatus(node, itemIndex, 'present');
+  }
+
+  void _moveFoundClothingToNode(
+    StoredWardrobeItem item,
+    StorageNode targetNode,
+  ) {
+    _moveExistingItemToNode(item, targetNode);
+    setState(() => _selectedNodeId = targetNode.id);
   }
 
   int _storedItemIndex(StoredWardrobeItem item) {
@@ -2065,6 +2081,8 @@ void _showClothingDetailSheet(
   StoredWardrobeItem item,
   int index, {
   VoidCallback? onConfirmPresent,
+  List<StorageNode> moveTargets = const <StorageNode>[],
+  ValueChanged<StorageNode>? onMoveToNode,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -2078,6 +2096,8 @@ void _showClothingDetailSheet(
         item: item,
         index: index,
         onConfirmPresent: onConfirmPresent,
+        moveTargets: moveTargets,
+        onMoveToNode: onMoveToNode,
       );
     },
   );
@@ -2088,11 +2108,15 @@ class _ClothingDetailSheet extends StatelessWidget {
     required this.item,
     required this.index,
     this.onConfirmPresent,
+    this.moveTargets = const <StorageNode>[],
+    this.onMoveToNode,
   });
 
   final StoredWardrobeItem item;
   final int index;
   final VoidCallback? onConfirmPresent;
+  final List<StorageNode> moveTargets;
+  final ValueChanged<StorageNode>? onMoveToNode;
 
   @override
   Widget build(BuildContext context) {
@@ -2168,7 +2192,125 @@ class _ClothingDetailSheet extends StatelessWidget {
               ),
             ),
           ],
+          if (onMoveToNode != null && moveTargets.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                key: ValueKey('move-from-detail-${item.nodeId}-$index'),
+                onPressed: () => _showMoveTargetSheet(context),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFFFC45C),
+                  side: const BorderSide(color: Color(0xFFFFC45C)),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                icon: const Icon(Icons.drive_file_move_outline),
+                label: const Text('改放到新位置'),
+              ),
+            ),
+          ],
         ],
+      ),
+    );
+  }
+
+  void _showMoveTargetSheet(BuildContext detailContext) {
+    showModalBottomSheet<void>(
+      context: detailContext,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF181411),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (targetContext) {
+        return SingleChildScrollView(
+          key: const ValueKey('move-target-sheet'),
+          padding: EdgeInsets.fromLTRB(
+            20,
+            18,
+            20,
+            MediaQuery.of(targetContext).viewInsets.bottom + 22,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '选择新位置',
+                style: Theme.of(targetContext).textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '选择现实衣橱里的新节点，系统会按目标位置自动重新编号。',
+                style: Theme.of(targetContext).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFD7FFF6),
+                ),
+              ),
+              const SizedBox(height: 16),
+              for (final node in moveTargets)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: _MoveTargetTile(
+                    node: node,
+                    onTap: () {
+                      onMoveToNode!(node);
+                      Navigator.of(targetContext).pop();
+                      Navigator.of(detailContext).pop();
+                    },
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MoveTargetTile extends StatelessWidget {
+  const _MoveTargetTile({required this.node, required this.onTap});
+
+  final StorageNode node;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      key: ValueKey('move-target-node-${node.id}'),
+      color: const Color(0xFF231C17),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                node.name,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '${node.id} / ${_nodeTypeLabel(node.nodeType)} / ${_axisLabel(node.orderAxis)}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFFD7C3A5),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
