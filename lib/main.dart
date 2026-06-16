@@ -326,9 +326,11 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
                 selectedNode: _selectedNode,
                 selectedAuditStatus: _auditStatusFor(_selectedNode),
                 unauditedCount: unauditedCount,
+                missingItemsCount: _missingStoredItems.length,
                 onSelected: _selectNode,
                 onShowDetails: () => _showNodeDetail(_selectedNode),
                 onFindClothes: _showFindClothesSheet,
+                onShowExceptions: _showExceptionClothesSheet,
               ),
             );
 
@@ -348,6 +350,12 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
 
   List<StoredWardrobeItem> get _allStoredItems {
     return [for (final items in _itemsByNode.values) ...items];
+  }
+
+  List<StoredWardrobeItem> get _missingStoredItems {
+    return _allStoredItems
+        .where((item) => item.presenceStatus == 'missing')
+        .toList(growable: false);
   }
 
   _AuditStatus _auditStatusFor(StorageNode node) {
@@ -662,6 +670,67 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
     );
   }
 
+  void _showExceptionClothesSheet() {
+    final missingItems = _missingStoredItems;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF181411),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SingleChildScrollView(
+          key: const ValueKey('exception-clothes-sheet'),
+          padding: EdgeInsets.fromLTRB(
+            20,
+            18,
+            20,
+            MediaQuery.of(context).viewInsets.bottom + 22,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '异常衣服',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '这些衣服已标记为“不在”，需要重新查找或修正映射。',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: const Color(0xFFD7FFF6),
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (missingItems.isEmpty)
+                Text(
+                  '当前没有异常衣服。',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: const Color(0xFFD7C3A5),
+                  ),
+                )
+              else
+                for (final item in missingItems)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _SearchResultTile(
+                      item: item,
+                      onTap: () => _openFoundClothing(item, context),
+                    ),
+                  ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _openFoundClothing(StoredWardrobeItem item, BuildContext sheetContext) {
     final itemIndex = _storedItemIndex(item);
     setState(() => _selectedNodeId = item.nodeId);
@@ -958,9 +1027,11 @@ class _TwinCommandDeck extends StatelessWidget {
     required this.selectedNode,
     required this.selectedAuditStatus,
     required this.unauditedCount,
+    required this.missingItemsCount,
     required this.onSelected,
     required this.onShowDetails,
     required this.onFindClothes,
+    required this.onShowExceptions,
   });
 
   final WardrobeStorageModel model;
@@ -968,9 +1039,11 @@ class _TwinCommandDeck extends StatelessWidget {
   final StorageNode selectedNode;
   final _AuditStatus selectedAuditStatus;
   final int unauditedCount;
+  final int missingItemsCount;
   final ValueChanged<StorageNode> onSelected;
   final VoidCallback onShowDetails;
   final VoidCallback onFindClothes;
+  final VoidCallback onShowExceptions;
 
   @override
   Widget build(BuildContext context) {
@@ -980,7 +1053,9 @@ class _TwinCommandDeck extends StatelessWidget {
         _HeroPanel(
           model: model,
           unauditedCount: unauditedCount,
+          missingItemsCount: missingItemsCount,
           onFindClothes: onFindClothes,
+          onShowExceptions: onShowExceptions,
         ),
         const SizedBox(height: 12),
         _SpatialMapCard(
@@ -1004,12 +1079,16 @@ class _HeroPanel extends StatelessWidget {
   const _HeroPanel({
     required this.model,
     required this.unauditedCount,
+    required this.missingItemsCount,
     required this.onFindClothes,
+    required this.onShowExceptions,
   });
 
   final WardrobeStorageModel model;
   final int unauditedCount;
+  final int missingItemsCount;
   final VoidCallback onFindClothes;
+  final VoidCallback onShowExceptions;
 
   @override
   Widget build(BuildContext context) {
@@ -1092,6 +1171,24 @@ class _HeroPanel extends StatelessWidget {
                       ),
                     ),
                     child: const Text('找衣服'),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    key: const ValueKey('exception-clothes-button'),
+                    onPressed: onShowExceptions,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFFFC45C),
+                      side: const BorderSide(color: Color(0xFFFFC45C)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    icon: const Icon(Icons.warning_amber_rounded),
+                    label: Text('异常衣服（$missingItemsCount）'),
                   ),
                 ),
               ],
