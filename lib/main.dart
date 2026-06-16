@@ -101,6 +101,49 @@ class _StoredPhotoEvidenceBadge extends StatelessWidget {
   }
 }
 
+class _LocationPreviewCard extends StatelessWidget {
+  const _LocationPreviewCard({required this.node, required this.locationIndex});
+
+  final StorageNode node;
+  final int locationIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      key: const ValueKey('item-location-preview'),
+      decoration: BoxDecoration(
+        color: const Color(0xFF203A34),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF6AD8C5)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.my_location_outlined,
+              color: Color(0xFF7AD3C2),
+              size: 20,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '自动定位码：${_locationCodeForNode(node.id, locationIndex)}\n现实找法：${_locationGuidanceForNode(node.id, node.name, locationIndex)}',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFFD7FFF6),
+                  fontWeight: FontWeight.w800,
+                  height: 1.35,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _ClothingDetailTextField extends StatelessWidget {
   const _ClothingDetailTextField({
     required this.fieldKey,
@@ -109,6 +152,7 @@ class _ClothingDetailTextField extends StatelessWidget {
     required this.hintText,
     this.keyboardType,
     this.autofocus = false,
+    this.onChanged,
   });
 
   final ValueKey<String> fieldKey;
@@ -117,6 +161,7 @@ class _ClothingDetailTextField extends StatelessWidget {
   final String hintText;
   final TextInputType? keyboardType;
   final bool autofocus;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +170,7 @@ class _ClothingDetailTextField extends StatelessWidget {
       controller: controller,
       autofocus: autofocus,
       keyboardType: keyboardType,
+      onChanged: onChanged,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: labelText,
@@ -646,6 +692,9 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
     final locationIndexController = TextEditingController();
     final visualController = TextEditingController();
     final photoRefController = TextEditingController();
+    final suggestedLocationIndex =
+        (_itemsByNode[node.id] ?? const []).length + 1;
+    locationIndexController.text = suggestedLocationIndex.toString();
     var mode = _AddClothingMode.createNew;
     showModalBottomSheet<void>(
       context: context,
@@ -660,6 +709,9 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
             final existingItems = _allStoredItems
                 .where((item) => item.nodeId != node.id)
                 .toList(growable: false);
+            final previewLocationIndex =
+                int.tryParse(locationIndexController.text.trim()) ??
+                suggestedLocationIndex;
 
             return SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(
@@ -776,6 +828,12 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
                       labelText: '空间内序号',
                       hintText: '例如：挂衣杆第 3 件就填 3',
                       keyboardType: TextInputType.number,
+                      onChanged: (_) => setSheetState(() {}),
+                    ),
+                    const SizedBox(height: 8),
+                    _LocationPreviewCard(
+                      node: node,
+                      locationIndex: previewLocationIndex,
                     ),
                     const SizedBox(height: 12),
                     _ClothingDetailTextField(
@@ -2330,28 +2388,44 @@ String _itemBrandSizeSummary(StoredWardrobeItem item) {
 }
 
 String _itemLocationCode(StoredWardrobeItem item) {
-  final nodeCode = item.nodeId.replaceFirst('W01-', '');
-  if (item.locationIndex <= 0) {
-    return nodeCode;
-  }
-  return '$nodeCode-${item.locationIndex}';
+  return _locationCodeForNode(item.nodeId, item.locationIndex);
 }
 
 String _itemLocationGuidance(StoredWardrobeItem item) {
-  final index = item.locationIndex;
+  return _locationGuidanceForNode(
+    item.nodeId,
+    item.nodeName,
+    item.locationIndex,
+  );
+}
+
+String _locationCodeForNode(String nodeId, int locationIndex) {
+  final nodeCode = nodeId.replaceFirst('W01-', '');
+  if (locationIndex <= 0) {
+    return nodeCode;
+  }
+  return '$nodeCode-$locationIndex';
+}
+
+String _locationGuidanceForNode(
+  String nodeId,
+  String nodeName,
+  int locationIndex,
+) {
+  final index = locationIndex;
   if (index <= 0) {
     return '先确认这件衣服所在的具体顺序。';
   }
-  if (item.nodeId.contains('-H')) {
-    return '在${item.nodeName}，按从左到右找第 $index 件。';
+  if (nodeId.contains('-H')) {
+    return '在$nodeName，按从左到右找第 $index 件。';
   }
-  if (item.nodeId.contains('-D')) {
-    return '打开${item.nodeName}，按从前到后找第 $index 件。';
+  if (nodeId.contains('-D')) {
+    return '打开$nodeName，按从前到后找第 $index 件。';
   }
-  if (item.nodeId.contains('-S')) {
-    return '在${item.nodeName}，按从上到下找第 $index 件。';
+  if (nodeId.contains('-S')) {
+    return '在$nodeName，按从上到下找第 $index 件。';
   }
-  return '在${item.nodeName}，找第 $index 件。';
+  return '在$nodeName，找第 $index 件。';
 }
 
 String _twinStatusLabel(String status) {
