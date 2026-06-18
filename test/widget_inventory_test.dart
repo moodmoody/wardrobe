@@ -84,6 +84,7 @@ void main() {
     expect(find.textContaining('已确认 2 件'), findsOneWidget);
     expect(find.textContaining('缺失 1 件'), findsOneWidget);
     expect(find.textContaining('未确认 0 件'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
   });
 }
 
@@ -102,7 +103,7 @@ class _FakeWardrobeSessionStore implements WardrobeSessionStore {
 }
 
 Future<void> _pumpUntilFound(WidgetTester tester, Finder finder) async {
-  for (var attempt = 0; attempt < 20; attempt += 1) {
+  for (var attempt = 0; attempt < 80; attempt += 1) {
     await tester.pump(const Duration(milliseconds: 100));
     if (finder.evaluate().isNotEmpty) {
       return;

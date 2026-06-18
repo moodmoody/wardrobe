@@ -16,6 +16,8 @@ enum _AuditStatus { verified, needsSorting, unknown }
 
 enum _AddClothingMode { createNew, existing }
 
+const double _phoneSheetMaxWidth = 430;
+
 class _PhotoEvidenceCard extends StatelessWidget {
   const _PhotoEvidenceCard({super.key, required this.captured});
 
@@ -372,46 +374,55 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      constraints: const BoxConstraints(maxWidth: _phoneSheetMaxWidth),
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return DraggableScrollableSheet(
-              initialChildSize: 0.82,
-              minChildSize: 0.45,
-              maxChildSize: 0.94,
-              builder: (context, scrollController) {
-                return DecoratedBox(
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF181411),
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(24),
-                    ),
-                  ),
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
-                    child: _WardrobeNodeDetail(
-                      model: widget.model,
-                      node: node,
-                      childCount: widget.model.childrenOf(node.id).length,
-                      storedItems: _itemsByNode[node.id] ?? const [],
-                      auditStatus: _auditStatusFor(node),
-                      onAuditStatusChanged: (status) {
-                        _setAuditStatus(node, status);
-                        setSheetState(() {});
-                      },
-                      onAddItem: () =>
-                          _showAddItemSheet(node, () => setSheetState(() {})),
-                      onItemPresenceChanged: (index, status) {
-                        _setItemPresenceStatus(node, index, status);
-                        setSheetState(() {});
-                      },
-                    ),
-                  ),
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _phoneSheetMaxWidth),
+            child: StatefulBuilder(
+              builder: (context, setSheetState) {
+                return DraggableScrollableSheet(
+                  initialChildSize: 0.82,
+                  minChildSize: 0.45,
+                  maxChildSize: 0.94,
+                  builder: (context, scrollController) {
+                    return DecoratedBox(
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF181411),
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(24),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        controller: scrollController,
+                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
+                        child: _WardrobeNodeDetail(
+                          model: widget.model,
+                          node: node,
+                          childCount: widget.model.childrenOf(node.id).length,
+                          storedItems: _itemsByNode[node.id] ?? const [],
+                          auditStatus: _auditStatusFor(node),
+                          onAuditStatusChanged: (status) {
+                            _setAuditStatus(node, status);
+                            setSheetState(() {});
+                          },
+                          onAddItem: () => _showAddItemSheet(
+                            node,
+                            () => setSheetState(() {}),
+                          ),
+                          onItemPresenceChanged: (index, status) {
+                            _setItemPresenceStatus(node, index, status);
+                            setSheetState(() {});
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
+            ),
+          ),
         );
       },
     );
@@ -571,6 +582,7 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF181411),
+      constraints: const BoxConstraints(maxWidth: _phoneSheetMaxWidth),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -797,252 +809,277 @@ class _WardrobeOverviewState extends State<_WardrobeOverview> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF181411),
+      backgroundColor: Colors.transparent,
+      constraints: const BoxConstraints(maxWidth: _phoneSheetMaxWidth),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            final existingItems = _allStoredItems
-                .where((item) => item.nodeId != node.id)
-                .toList(growable: false);
-            final previewLocationIndex =
-                int.tryParse(locationIndexController.text.trim()) ??
-                suggestedLocationIndex;
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _phoneSheetMaxWidth),
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                color: Color(0xFF181411),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: StatefulBuilder(
+                builder: (context, setSheetState) {
+                  final existingItems = _allStoredItems
+                      .where((item) => item.nodeId != node.id)
+                      .toList(growable: false);
+                  final previewLocationIndex =
+                      int.tryParse(locationIndexController.text.trim()) ??
+                      suggestedLocationIndex;
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(
-                20,
-                18,
-                20,
-                MediaQuery.of(context).viewInsets.bottom + 22,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '放入一件衣服',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(
+                      20,
+                      18,
+                      20,
+                      MediaQuery.of(context).viewInsets.bottom + 22,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '当前位置：${node.name}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: const Color(0xFFD7FFF6),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  SegmentedButton<_AddClothingMode>(
-                    showSelectedIcon: false,
-                    selected: {mode},
-                    onSelectionChanged: (selection) =>
-                        setSheetState(() => mode = selection.first),
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.resolveWith((
-                        states,
-                      ) {
-                        return states.contains(WidgetState.selected)
-                            ? const Color(0xFF12201C)
-                            : const Color(0xFFE7DAC7);
-                      }),
-                      backgroundColor: WidgetStateProperty.resolveWith((
-                        states,
-                      ) {
-                        return states.contains(WidgetState.selected)
-                            ? const Color(0xFF7AD3C2)
-                            : const Color(0xFF2E2925);
-                      }),
-                      side: WidgetStateProperty.all(
-                        const BorderSide(color: Color(0xFF6AD8C5)),
-                      ),
-                    ),
-                    segments: const [
-                      ButtonSegment(
-                        value: _AddClothingMode.createNew,
-                        label: Text('新衣服建档'),
-                      ),
-                      ButtonSegment(
-                        value: _AddClothingMode.existing,
-                        label: Text(
-                          '选择已有衣服',
-                          key: ValueKey('add-mode-existing'),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '放入一件衣服',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  if (mode == _AddClothingMode.createNew) ...[
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-name-input'),
-                      controller: controller,
-                      labelText: '衣服名称',
-                      hintText: '例如：黑色外套',
-                      autofocus: true,
-                    ),
-                    const SizedBox(height: 12),
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-category-input'),
-                      controller: categoryController,
-                      labelText: '类型',
-                      hintText: '例如：外套 / 衬衫 / 裤子',
-                    ),
-                    const SizedBox(height: 12),
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-color-input'),
-                      controller: colorController,
-                      labelText: '主色',
-                      hintText: '例如：黑色',
-                    ),
-                    const SizedBox(height: 12),
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-material-input'),
-                      controller: materialController,
-                      labelText: '材质/特征',
-                      hintText: '例如：羊毛 / 牛仔 / 条纹',
-                    ),
-                    const SizedBox(height: 12),
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-brand-input'),
-                      controller: brandController,
-                      labelText: '品牌',
-                      hintText: '可选，例如：Uniqlo',
-                    ),
-                    const SizedBox(height: 12),
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-size-input'),
-                      controller: sizeController,
-                      labelText: '尺码',
-                      hintText: '可选，例如：M',
-                    ),
-                    const SizedBox(height: 12),
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-location-index-input'),
-                      controller: locationIndexController,
-                      labelText: '空间内序号',
-                      hintText: '例如：挂衣杆第 3 件就填 3',
-                      keyboardType: TextInputType.number,
-                      onChanged: (_) => setSheetState(() {}),
-                    ),
-                    const SizedBox(height: 8),
-                    _LocationPreviewCard(
-                      node: node,
-                      locationIndex: previewLocationIndex,
-                    ),
-                    const SizedBox(height: 12),
-                    _ClothingDetailTextField(
-                      fieldKey: const ValueKey('item-visual-input'),
-                      controller: visualController,
-                      labelText: '视觉身份',
-                      hintText: '例如：正面黑色拉链外套照片',
-                    ),
-                    const SizedBox(height: 12),
-                    _PhotoEvidenceCard(
-                      key: ValueKey(
-                        photoRefController.text.trim().isEmpty
-                            ? 'photo-evidence-empty'
-                            : 'photo-evidence-captured',
-                      ),
-                      captured: photoRefController.text.trim().isNotEmpty,
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        key: const ValueKey('mock-capture-photo-button'),
-                        onPressed: () {
-                          photoRefController.text = _newMockPhotoRef(node);
-                          setSheetState(() {});
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF7AD3C2),
-                          side: const BorderSide(color: Color(0xFF6AD8C5)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                        const SizedBox(height: 8),
+                        Text(
+                          '当前位置：${node.name}',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: const Color(0xFFD7FFF6)),
+                        ),
+                        const SizedBox(height: 14),
+                        SegmentedButton<_AddClothingMode>(
+                          showSelectedIcon: false,
+                          selected: {mode},
+                          onSelectionChanged: (selection) =>
+                              setSheetState(() => mode = selection.first),
+                          style: ButtonStyle(
+                            foregroundColor: WidgetStateProperty.resolveWith((
+                              states,
+                            ) {
+                              return states.contains(WidgetState.selected)
+                                  ? const Color(0xFF12201C)
+                                  : const Color(0xFFE7DAC7);
+                            }),
+                            backgroundColor: WidgetStateProperty.resolveWith((
+                              states,
+                            ) {
+                              return states.contains(WidgetState.selected)
+                                  ? const Color(0xFF7AD3C2)
+                                  : const Color(0xFF2E2925);
+                            }),
+                            side: WidgetStateProperty.all(
+                              const BorderSide(color: Color(0xFF6AD8C5)),
+                            ),
                           ),
+                          segments: const [
+                            ButtonSegment(
+                              value: _AddClothingMode.createNew,
+                              label: Text('新衣服建档'),
+                            ),
+                            ButtonSegment(
+                              value: _AddClothingMode.existing,
+                              label: Text(
+                                '选择已有衣服',
+                                key: ValueKey('add-mode-existing'),
+                              ),
+                            ),
+                          ],
                         ),
-                        icon: const Icon(Icons.photo_camera_outlined),
-                        label: const Text('模拟拍照生成主图'),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        key: const ValueKey('save-item-button'),
-                        onPressed: () {
-                          final name = controller.text.trim();
-                          final category = categoryController.text.trim();
-                          final color = colorController.text.trim();
-                          final material = materialController.text.trim();
-                          final brand = brandController.text.trim();
-                          final size = sizeController.text.trim();
-                          final locationIndex =
-                              int.tryParse(
-                                locationIndexController.text.trim(),
-                              ) ??
-                              ((_itemsByNode[node.id] ?? const []).length + 1);
-                          final visualSignature = visualController.text.trim();
-                          final primaryPhotoRef = photoRefController.text
-                              .trim();
-                          if (name.isEmpty) {
-                            return;
-                          }
-                          _addItemToNode(
-                            node,
-                            name,
-                            category,
-                            color,
-                            material,
-                            brand,
-                            size,
-                            locationIndex,
-                            visualSignature,
-                            primaryPhotoRef,
-                          );
-                          refreshDetailSheet();
-                          Navigator.of(context).pop();
-                        },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: const Color(0xFF7AD3C2),
-                          foregroundColor: const Color(0xFF12201C),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                        const SizedBox(height: 16),
+                        if (mode == _AddClothingMode.createNew) ...[
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey('item-name-input'),
+                            controller: controller,
+                            labelText: '衣服名称',
+                            hintText: '例如：黑色外套',
+                            autofocus: true,
                           ),
-                        ),
-                        child: const Text('保存到当前位置'),
-                      ),
+                          const SizedBox(height: 12),
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey('item-category-input'),
+                            controller: categoryController,
+                            labelText: '类型',
+                            hintText: '例如：外套 / 衬衫 / 裤子',
+                          ),
+                          const SizedBox(height: 12),
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey('item-color-input'),
+                            controller: colorController,
+                            labelText: '主色',
+                            hintText: '例如：黑色',
+                          ),
+                          const SizedBox(height: 12),
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey('item-material-input'),
+                            controller: materialController,
+                            labelText: '材质/特征',
+                            hintText: '例如：羊毛 / 牛仔 / 条纹',
+                          ),
+                          const SizedBox(height: 12),
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey('item-brand-input'),
+                            controller: brandController,
+                            labelText: '品牌',
+                            hintText: '可选，例如：Uniqlo',
+                          ),
+                          const SizedBox(height: 12),
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey('item-size-input'),
+                            controller: sizeController,
+                            labelText: '尺码',
+                            hintText: '可选，例如：M',
+                          ),
+                          const SizedBox(height: 12),
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey(
+                              'item-location-index-input',
+                            ),
+                            controller: locationIndexController,
+                            labelText: '空间内序号',
+                            hintText: '例如：挂衣杆第 3 件就填 3',
+                            keyboardType: TextInputType.number,
+                            onChanged: (_) => setSheetState(() {}),
+                          ),
+                          const SizedBox(height: 8),
+                          _LocationPreviewCard(
+                            node: node,
+                            locationIndex: previewLocationIndex,
+                          ),
+                          const SizedBox(height: 12),
+                          _ClothingDetailTextField(
+                            fieldKey: const ValueKey('item-visual-input'),
+                            controller: visualController,
+                            labelText: '视觉身份',
+                            hintText: '例如：正面黑色拉链外套照片',
+                          ),
+                          const SizedBox(height: 12),
+                          _PhotoEvidenceCard(
+                            key: ValueKey(
+                              photoRefController.text.trim().isEmpty
+                                  ? 'photo-evidence-empty'
+                                  : 'photo-evidence-captured',
+                            ),
+                            captured: photoRefController.text.trim().isNotEmpty,
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              key: const ValueKey('mock-capture-photo-button'),
+                              onPressed: () {
+                                photoRefController.text = _newMockPhotoRef(
+                                  node,
+                                );
+                                setSheetState(() {});
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: const Color(0xFF7AD3C2),
+                                side: const BorderSide(
+                                  color: Color(0xFF6AD8C5),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              icon: const Icon(Icons.photo_camera_outlined),
+                              label: const Text('模拟拍照生成主图'),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            width: double.infinity,
+                            child: FilledButton(
+                              key: const ValueKey('save-item-button'),
+                              onPressed: () {
+                                final name = controller.text.trim();
+                                final category = categoryController.text.trim();
+                                final color = colorController.text.trim();
+                                final material = materialController.text.trim();
+                                final brand = brandController.text.trim();
+                                final size = sizeController.text.trim();
+                                final locationIndex =
+                                    int.tryParse(
+                                      locationIndexController.text.trim(),
+                                    ) ??
+                                    ((_itemsByNode[node.id] ?? const [])
+                                            .length +
+                                        1);
+                                final visualSignature = visualController.text
+                                    .trim();
+                                final primaryPhotoRef = photoRefController.text
+                                    .trim();
+                                if (name.isEmpty) {
+                                  return;
+                                }
+                                _addItemToNode(
+                                  node,
+                                  name,
+                                  category,
+                                  color,
+                                  material,
+                                  brand,
+                                  size,
+                                  locationIndex,
+                                  visualSignature,
+                                  primaryPhotoRef,
+                                );
+                                refreshDetailSheet();
+                                Navigator.of(context).pop();
+                              },
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFF7AD3C2),
+                                foregroundColor: const Color(0xFF12201C),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              child: const Text('保存到当前位置'),
+                            ),
+                          ),
+                        ] else if (existingItems.isEmpty)
+                          Text(
+                            '还没有可选择的已建档衣服。',
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: const Color(0xFFD7C3A5)),
+                          )
+                        else
+                          for (final item in existingItems)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: _SearchResultTile(
+                                item: item,
+                                onTap: () {
+                                  _moveExistingItemToNode(item, node);
+                                  refreshDetailSheet();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ),
+                      ],
                     ),
-                  ] else if (existingItems.isEmpty)
-                    Text(
-                      '还没有可选择的已建档衣服。',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: const Color(0xFFD7C3A5),
-                      ),
-                    )
-                  else
-                    for (final item in existingItems)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: _SearchResultTile(
-                          item: item,
-                          onTap: () {
-                            _moveExistingItemToNode(item, node);
-                            refreshDetailSheet();
-                            Navigator.of(context).pop();
-                          },
-                        ),
-                      ),
-                ],
+                  );
+                },
               ),
-            );
-          },
+            ),
+          ),
         );
       },
     );
